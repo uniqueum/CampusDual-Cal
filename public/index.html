@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Dual Cal Web Applet</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>Campus Dual Cal Web Applet</h1>
+  <nav>
+    <a href="#" onclick="location.reload()">Configuration</a>
+  </nav>
+</header>
+
+<div class="page-container">
+  <!-- Left Sidebar: Permanent System Engine Controls -->
+  <aside class="sidebar-left">
+    <h3>System Engine Control</h3>
+    <div class="dashboard-actions">
+      <button id="btnRunSync" class="btn-submit btn-sync">⚡ Sync remote schedule</button>
+      <button id="btnRunUpload" class="btn-submit btn-upload">📤 Upload schedule to Google Calendar</button>
+      <button id="btnStrapBoots" class="btn-submit btn-boots">🥾 Strap the boots!</button>
+      <button id="btnViewLocal" class="btn-submit btn-local" style="display: none;">📅 Display schedule locally in browser</button>
+    </div>
+  </aside>
+
+  <!-- Main Workspace: Holds configuration form initially, then swaps to calendar template -->
+  <main id="mainWorkspace">
+    <h2>Campus Dual & Google Calendar Synchronization</h2>
+    <p class="highlight-text">
+      🚀 Session-based automation via local browser cookies.
+    </p>
+    <p>All data entered here is written strictly to your local computer's file system.</p>
+
+    <form id="configForm" autocomplete="off">
+      <div class="form-group">
+        <label for="studentId">Student ID (Matrikelnummer):</label>
+        <input type="text" id="studentId" name="studentId" placeholder="e.g., 1234567" required>
+      </div>
+
+      <div class="form-group">
+        <label for="browser">Target Browser Session:</label>
+        <select id="browser" name="browser">
+          <option value="chrome" selected>Google Chrome</option>
+          <option value="firefox">Mozilla Firefox</option>
+          <option value="edge">Microsoft Edge</option>
+          <option value="opera">Opera</option>
+          <option value="safari">Safari</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startDate">Start Date:</label>
+          <input type="date" id="startDate" name="startDate" value="2026-04-20" required>
+        </div>
+        <div class="form-group">
+          <label for="endDate">End Date:</label>
+          <input type="date" id="endDate" name="endDate" value="2026-07-12" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="label-action-row">
+          <label for="calendarId">Google Calendar ID (Uni Cal):</label>
+          <button type="button" id="btnToggleCalInfo">ℹ️ Setup Guide</button>
+        </div>
+        <input type="text" id="calendarId" name="calendarId" placeholder="e.g., example-calendar-id@group.calendar.google.com">
+        <div id="calInfoBox" class="hidden">
+          <strong>Google Calendar Setup:</strong>
+          <ol>
+            <li>Create a sub-calendar named <strong>"Uni Cal"</strong>.</li>
+            <li>Copy its Calendar ID from the settings.</li>
+            <li>Ensure <code>credentials.json</code> is in the root folder.</li>
+          </ol>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">Save Local Configuration</button>
+    </form>
+  </main>
+
+  <!-- Right Sidebar: Status Monitor & Terminal (Always Stays) -->
+  <aside class="sidebar-right">
+    <h3>Status Monitor</h3>
+    <div id="statusOutput" class="status-box empty">Awaiting data entry...</div>
+    <div id="terminalConsole">
+      <div class="terminal-header">💻 System Engine Output:</div>
+      <pre id="terminalLines"></pre>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <p>&copy; 2026 <a href="https://github.com/uniqueum/CampusDual-Cal" target="_blank">Campus Dual Cal Web Applet</a> | Jens Kerger</p>
+  <nav class="footer-nav">
+    <a href="#" onclick="renderPrivacy()">Privacy</a>
+  </nav>
+</footer>
+
+<!-- Template used by app.js to populate the main pane with the calendar view upon saving -->
+<template id="authenticatedDashboard">
+  <div id="calendarDisplayFrame">
+    <div id="calendarCanvas"></div>
+  </div>
+</template>
+
+<script src="app.js"></script>
+</body>
+</html>

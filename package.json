@@ -1,0 +1,24 @@
+{
+  "name": "campusdual-cal-applet",
+  "version": "1.0.0",
+  "description": "Local campus synchronization applet for Berufsakademie Dresden",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo 'Frontend is static HTML/CSS/JS. Ready for deployment.'",
+    "lint": "eslint public/*.js server.js",
+    "format": "prettier --write public/* server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "prettier": "^3.2.5"
+  },
+  "keywords": [],
+  "author": "Jens",
+  "license": "ISC"
+}

@@ -1,0 +1,20 @@
+# Dependency directories
+node_modules/
+
+# Sensitive credentials and tokens
+credentials.json
+token.json
+config.json
+
+# Local data dumps and logs
+campus_dual_dump.json
+clean_standardized_calendar.json
+json_calendar.txt
+simple_calendar.txt
+pipeline_debug.log
+
+# Documentation and project-specific files to exclude
+DISCLAIMER.md
+
+# System files (if any)
+.DS_Store

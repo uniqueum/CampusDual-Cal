@@ -1,0 +1,351 @@
+/* Universal Resets */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+          sans-serif;
+  color: #333;
+  background-color: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Lock viewport height */
+  overflow: hidden; /* Prevent body itself from scrolling */
+}
+
+/* Header styling */
+header {
+  background-color: #1e293b;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0; /* Prevent header from resizing */
+}
+
+header h1 {
+  font-size: 1.5rem;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+
+nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+nav a.active {
+  color: #fff;
+  border-bottom: 2px solid #38bdf8;
+  padding-bottom: 0.25rem;
+}
+
+/* Layout Framework */
+.page-container {
+  display: flex;
+  flex: 1; /* Take up all remaining space between header & footer */
+  overflow: hidden; /* Structure boundary for child containers */
+}
+
+/* Sidebar styling (Fixed) */
+aside {
+  background-color: #fff;
+  width: 260px;
+  padding: 1.5rem;
+  border-right: 1px solid #e2e8f0;
+  flex-shrink: 0; /* Keep fixed width */
+  overflow-y: auto; /* Allow sidebar internal scroll if needed */
+}
+
+.sidebar-right {
+  border-right: none;
+  border-left: 1px solid #e2e8f0;
+  width: 420px;
+}
+
+/* Scrollable Workspace (The Core Requirement) */
+main {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto; /* ONLY the main window scrolls when content overflows */
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers child contents horizontally */
+}
+
+/* Restrict default direct children to 600px, except the dashboard/calendar view */
+main > form,
+main > .instructions-card,
+main > h2,
+main > p {
+  width: 100%;
+  max-width: 600px;
+}
+
+main h2 {
+  margin-bottom: 0.5rem;
+  color: #0f172a;
+  text-align: left; /* Keep headings left-aligned relative to the bounded box */
+}
+
+/* Information Cards & Forms */
+.instructions-card {
+  background-color: #f0fdf4;
+  border-left: 4px solid #22c55e;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1.5rem 0;
+}
+
+.instructions-card h3 {
+  color: #166534;
+  margin-bottom: 0.5rem;
+}
+
+.instructions-card ol {
+  margin-left: 1.25rem;
+  color: #14532d;
+  line-height: 1.6;
+}
+
+form {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  max-width: 600px;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #f8fafc;
+}
+
+input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  background-color: #fff;
+}
+
+.btn-submit {
+  background-color: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.btn-submit:hover {
+  background-color: #1d4ed8;
+}
+
+/* Status Monitor Box */
+.status-box {
+  padding: 1rem;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  line-height: 1.4;
+}
+
+.status-box.empty {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px dashed #cbd5e1;
+}
+
+.status-box.success {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.status-box.error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* Footer styling */
+footer {
+  background-color: #1e293b;
+  color: #94a3b8;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.875rem;
+  flex-shrink: 0; /* Prevent footer from shrinking */
+  border-top: 1px solid #334155;
+}
+
+footer a {
+  color: #cbd5e1;
+  text-decoration: none;
+  margin: 0 0.5rem;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Dashboard & Template Styling Extensions */
+.highlight-text {
+  margin: 0.5rem 0;
+  color: #10b981;
+  font-weight: bold;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.label-action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.label-action-row label {
+  margin-bottom: 0;
+}
+
+#btnToggleCalInfo {
+  background: #0284c7;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+#calInfoBox {
+  margin-top: 0.75rem;
+  background-color: #f0fdfa;
+  border-left: 4px solid #0284c7;
+  padding: 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #0f172a;
+}
+
+#calInfoBox ol {
+  margin-left: 1.25rem;
+  margin-top: 0.5rem;
+  padding-left: 0;
+}
+
+#terminalConsole {
+  display: none;
+  margin-top: 1.0rem;
+  background-color: #0f172a;
+  color: #38bdf8;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  max-height: 400px;
+  overflow-y: auto;
+  line-height: 1.4;
+}
+
+.terminal-header {
+  color: #64748b;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+#terminalLines {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.footer-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.dashboard-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 600px;
+}
+
+.btn-sync { background-color: #10b981; }
+.btn-upload { background-color: #4f46e5; width: 100%; }
+.btn-boots { background-color: #f43f5e; width: 100%; }
+.btn-local { background-color: #f59e0b; }
+
+#dashboardView,
+#calendarDisplayFrame {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#calendarDisplayFrame {
+  margin-top: 1.5rem;
+  background: #fff;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+#calendarCanvas {
+  width: 100% !important;
+  min-height: 700px;
+  background: #ffffff;
+}
+
+/* FullCalendar Customizations */
+.fc .fc-toolbar-title { font-size: 1.25rem !important; color: #0f172a; }
+.fc .fc-button-primary { background-color: #1e293b !important; border: none !important; }
