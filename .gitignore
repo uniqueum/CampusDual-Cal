@@ -9,8 +9,7 @@ config.json
 # Local data dumps and logs
 campus_dual_dump.json
 clean_standardized_calendar.json
-json_calendar.txt
-simple_calendar.txt
+campus_dual_calendar.ics
 pipeline_debug.log
 
 # Documentation and project-specific files to exclude

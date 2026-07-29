@@ -1,0 +1,10 @@
+{
+    "campus_dual": {
+        "student_id": "YOUR_STUDENT_ID",
+        "start_date": "DATE_0",
+        "end_date": "DATE_1"
+    },
+    "google_calendar": {
+        "calendar_id": "G-CAL_ID"
+    }
+}

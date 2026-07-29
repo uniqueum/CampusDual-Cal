@@ -1,9 +1,16 @@
-﻿# main.py
+# main.py
 
-import subprocess
 import sys
+import os
+import shutil
 
-# Force UTF-8 immediately so printing warning/status emojis never triggers charmap errors on Windows
+# 1. Force the working directory to the folder containing this script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
+
+# 2. Force UTF-8 immediately so printing warning/status emojis never triggers charmap errors on Windows
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
     try:
         sys.stdout.reconfigure(encoding='utf-8')
@@ -11,46 +18,20 @@ if sys.stdout and hasattr(sys.stdout, "reconfigure"):
         pass
 
 import subprocess
-
-def auto_bootstrap():
-    # Map import names to their actual PyPI package names
-    package_mapping = {
-        "requests": "requests",
-        "bs4": "beautifulsoup4",
-        "googleapiclient": "google-api-python-client",
-        "google_auth_oauthlib": "google-auth-oauthlib",
-        "urllib3": "urllib3"
-    }
-
-    try:
-        import importlib.metadata
-        missing = []
-        for mod_name, pkg_name in package_mapping.items():
-            try:
-                importlib.metadata.version(pkg_name)
-            except importlib.metadata.PackageNotFoundError:
-                missing.append(pkg_name)
-
-        if missing:
-            print(f"📦 Auto-installing missing dependencies: {missing}...", flush=True)
-            subprocess.check_call([sys.executable, "-m", "pip", "install", *missing], stdout=sys.stdout, stderr=sys.stderr)
-        else:
-            print("✅ All dependencies verified.", flush=True)
-    except Exception as e:
-        print(f"⚠️ Warning: Could not verify packages automatically: {e}", flush=True)
-
-
-import os
 import json
-import sys
 from datetime import datetime
-from auth import get_authenticated_session
-import sap_token as token_helper
-import sync_calendar as fetcher
-import processor
-import uploader
 
 CONFIG_FILE = "config.json"
+
+def bootstrap():
+    """Delegates the environment setup and dependency verification to bootstrap.py."""
+    bootstrap_script = os.path.join(script_dir, "bootstrap.py")
+    if os.path.exists(bootstrap_script):
+        print("🥾 Delegating to external bootstrap.py...", flush=True)
+        subprocess.check_call([sys.executable, bootstrap_script] + sys.argv[2:])
+    else:
+        raise FileNotFoundError(f"Missing required bootstrap script: '{bootstrap_script}' not found.")
+
 
 def load_global_config():
     """Reads execution variables from config.json."""
@@ -63,33 +44,48 @@ def load_global_config():
     cd_config = config.get("campus_dual", {})
     return {
         "student_id": cd_config.get("student_id"),
-        "browser": cd_config.get("browser", "chrome"),
         "start_date": cd_config.get("start_date", "2026-04-20"),
         "end_date": cd_config.get("end_date", "2026-07-12")
     }
 
+
 def main():
+    print("--- PYTHON DIAGNOSTIC CHECK ---", flush=True)
+    print("Current Working Directory:", os.getcwd(), flush=True)
+    print("Script Directory:", script_dir, flush=True)
+    print("Python Executable:", sys.executable, flush=True)
+    print("sys.path:", sys.path, flush=True)
+    print("Files in script directory:", os.listdir(script_dir), flush=True)
+    print("-------------------------------", flush=True)
+
     # Force UTF-8 output encoding for terminal streams on Windows to prevent charmap errors
     if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
         sys.stdout.reconfigure(encoding='utf-8')
 
-    # Support mode arguments (e.g., python main.py fetch or python main.py upload)
+    # Support mode arguments (e.g., python main.py bootstrap, sync-only, etc.)
     mode = sys.argv[1] if len(sys.argv) > 1 else "all"
 
     if mode == "bootstrap":
-        print("🥾 Starting dependency bootstrap routine...", flush=True)
-        auto_bootstrap()
-        print("\n✨ Bootstrap check complete!", flush=True)
+        bootstrap()
         return
 
-    print("Initializing DHSN-Cal Orchestrator...", flush=True)
+    # A) Lazy-load local and third-party modules ONLY when NOT bootstrapping.
+    if script_dir not in sys.path:
+        sys.path.insert(0, script_dir)
+
+    global get_authenticated_session, token_helper, fetcher, processor, uploader
+    from auth import get_authenticated_session
+    import sap_token as token_helper
+    import sync_calendar as fetcher
+    import processor
+    import uploader
 
     print("Initializing DHSN-Cal Orchestrator...", flush=True)
 
     # 1. Load Global Config Variables
     try:
         config = load_global_config()
-        print(f"Loaded config for User: {config['student_id']} using browser: {config['browser']}", flush=True)
+        print(f"Loaded config for User: {config['student_id']} using browser: firefox", flush=True)
     except Exception as e:
         print(f"❌ Configuration Error: {e}", flush=True)
         return
@@ -98,7 +94,7 @@ def main():
     if mode == "sync-only" or mode == "fetch":
         try:
             print("Extracting session cookies and initializing session...", flush=True)
-            session = get_authenticated_session(browser_name=config["browser"])
+            session = get_authenticated_session(browser_name="firefox")
 
             print(f"Fetching timetable from {config['start_date']} to {config['end_date']}...", flush=True)
             csrf_token = token_helper.get_csrf_token(session)
@@ -106,7 +102,6 @@ def main():
             start_dt = datetime.strptime(config["start_date"], "%Y-%m-%d")
             end_dt = datetime.strptime(config["end_date"], "%Y-%m-%d")
 
-            # Call fetcher to write campus_dual_dump.html directly (no JSON dump)
             fetcher.fetch_campus_dual_timetable(session, csrf_token, start_dt, end_dt)
 
             print("Data fetch step reached and dumped successfully.", flush=True)
@@ -121,12 +116,12 @@ def main():
     # 2. Authenticate Session via Browser Cookies (for full run)
     try:
         print("Extracting session cookies and initializing session...", flush=True)
-        session = get_authenticated_session(browser_name=config["browser"])
+        session = get_authenticated_session(browser_name="firefox")
     except Exception as e:
         print(f"❌ Authentication Error: {e}", flush=True)
         return
 
-    # 3. Fetch Timetable Data (Passing session, token, and dynamic dates)
+    # 3. Fetch Timetable Data
     try:
         print(f"Fetching timetable from {config['start_date']} to {config['end_date']}...", flush=True)
 
@@ -136,7 +131,6 @@ def main():
         start_dt = datetime.strptime(config["start_date"], "%Y-%m-%d")
         end_dt = datetime.strptime(config["end_date"], "%Y-%m-%d")
 
-        # Invoke the fetcher correctly so it generates campus_dual_dump.html
         fetcher.fetch_campus_dual_timetable(session, csrf_token, start_dt, end_dt)
 
         print("Data fetch step reached and dumped successfully.", flush=True)

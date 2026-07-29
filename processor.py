@@ -1,10 +1,13 @@
-﻿import json
+import json
 import re
 import os
+import uuid
 from datetime import datetime
 from bs4 import BeautifulSoup
 
 INPUT_FILE = "campus_dual_dump.html"
+OUTPUT_JSON = "clean_standardized_calendar.json"
+OUTPUT_ICS = "campus_dual_schedule.ics"
 
 def parse_title_times(title):
     """Extracts custom timeframe from edge-case titles."""
@@ -28,6 +31,50 @@ def parse_title_times(title):
         return sh, sm, eh, em
     return None
 
+def format_ics_datetime(dt):
+    """Formats a datetime object to UTC string as required by iCalendar specs."""
+    return dt.strftime('%Y%m%dT%H%M%S')
+
+def escape_ics_text(text):
+    """Escapes special characters reserved in RFC 5545."""
+    if not text:
+        return ""
+    return text.replace('\\', '\\\\').replace(';', '\\;').replace(',', '\\,').replace('\n', '\\n')
+
+def generate_ics_content(events_list):
+    """Generates valid RFC 5545 iCalendar standard string from event entries."""
+    now_stamp = datetime.now().strftime('%Y%m%dT%H%M%SZ')
+
+    lines = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//DHSN-Cal Script//CampusDual Exporter//DE",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH"
+    ]
+
+    for ev in events_list:
+        # Generate unique UID based on event identity to ensure predictable updates
+        start_dt = datetime.fromisoformat(ev['start'])
+        end_dt = datetime.fromisoformat(ev['end'])
+
+        uid = f"{format_ics_datetime(start_dt)}-{hash(ev['summary'])}@dhsn-cal.local"
+
+        lines.extend([
+            "BEGIN:VEVENT",
+            f"UID:{uid}",
+            f"DTSTAMP:{now_stamp}",
+            f"DTSTART:{format_ics_datetime(start_dt)}",
+            f"DTEND:{format_ics_datetime(end_dt)}",
+            f"SUMMARY:{escape_ics_text(ev['summary'])}",
+            f"LOCATION:{escape_ics_text(ev['location'])}",
+            f"DESCRIPTION:{escape_ics_text(ev['description'])}",
+            "END:VEVENT"
+        ])
+
+    lines.append("END:VCALENDAR")
+    return "\r\n".join(lines)
+
 def main():
     if not os.path.exists(INPUT_FILE):
         print(f"Error: Could not find '{INPUT_FILE}'.")
@@ -39,7 +86,6 @@ def main():
     soup = BeautifulSoup(html_content, 'html.parser')
     tables = soup.find_all('table', class_='Plan')
 
-    # Standard BA Dresden time slot mapping dictionary
     time_slots = {
         1: ("07:45", "09:15"),
         2: ("09:45", "11:15"),
@@ -79,9 +125,7 @@ def main():
                     except Exception:
                         pass
 
-        rows = table.find_all('tr')[1:] # Skip header row
-
-        # Track active row spans dynamically per day column index (1-indexed based on data columns)
+        rows = table.find_all('tr')[1:]
         row_spans = {}
 
         for row_idx, row in enumerate(rows):
@@ -97,14 +141,11 @@ def main():
             default_start_str, default_end_str = time_slots.get(slot_num, ("00:00", "00:00"))
 
             day_cells = row.find_all('td')
-
-            # Map physical DOM cells to logical column indices, accounting for active rowspans from previous rows
             cell_pointer = 0
             col_cursor = 1
-            max_day_cols = 5 # Mon-Fri
+            max_day_cols = 5
 
             while col_cursor <= max_day_cols:
-                # If this column is currently occupied by a multi-row span from above, decrement and skip
                 if row_spans.get(col_cursor, 0) > 0:
                     row_spans[col_cursor] -= 1
                     col_cursor += 1
@@ -117,12 +158,9 @@ def main():
                 cell_pointer += 1
 
                 date_str = col_dates.get(col_cursor)
-
-                # Check for multiple lectures inside the same cell (e.g. multi-line presentations)
                 fach_spans = cell.find_all('span', class_='fach')
 
                 if fach_spans and date_str:
-                    # Handle multiple sub-events packed into a single table cell
                     dozent_spans = cell.find_all('span', class_='dozent')
                     ort_spans = cell.find_all('span', class_='ort')
                     bemerkung_spans = cell.find_all('span', class_='bemerkung')
@@ -154,7 +192,6 @@ def main():
                             "end": final_end
                         })
                 else:
-                    # Check for single/standard span handling if no sub-spans or empty cell
                     rowspan = int(cell.get('rowspan', 1))
                     if rowspan > 1:
                         for span_i in range(1, rowspan):
@@ -234,10 +271,16 @@ def main():
 
     sorted_output = sorted(master_event_log.values(), key=lambda x: x['start'])
 
-    with open("clean_standardized_calendar.json", "w", encoding="utf-8") as f:
+    # 1. Output JSON File
+    with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         json.dump(sorted_output, f, ensure_ascii=False, indent=4)
 
-    print("Success! HTML timetable successfully parsed and converted into standard event stream.")
+    # 2. Output ICS File
+    ics_data = generate_ics_content(sorted_output)
+    with open(OUTPUT_ICS, "w", encoding="utf-8", newline="\r\n") as f:
+        f.write(ics_data)
+
+    print(f"Success! Exported {len(sorted_output)} events to '{OUTPUT_JSON}' and '{OUTPUT_ICS}'.")
 
 if __name__ == "__main__":
     main()

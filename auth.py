@@ -1,4 +1,4 @@
-﻿import browser_cookie3
+import browser_cookie3
 import requests
 
 def get_authenticated_session(browser_name: str, domain_name: str = "campus-dual.de") -> requests.Session:
