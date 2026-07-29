@@ -1,4 +1,7 @@
 # Dependency directories
+.idea/
+.venv/
+__pycache__
 node_modules/
 
 # Sensitive credentials and tokens
@@ -13,7 +16,6 @@ campus_dual_calendar.ics
 pipeline_debug.log
 
 # Documentation and project-specific files to exclude
-DISCLAIMER.md
 
 # System files (if any)
 .DS_Store
