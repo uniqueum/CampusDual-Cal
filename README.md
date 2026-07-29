@@ -12,6 +12,11 @@ This application runs **locally** on your computer. All configuration and synchr
 ### 1. Prerequisites
 * Node.js installed on your machine.
 * Python installed on your machine.
+* **Mozilla Firefox** (or another Gecko-based browser like LibreWolf or Floorp).
+
+> **Why Firefox?**  
+> Under Windows, Chromium-based browsers (Chrome, Edge, Opera, etc.) lock their cookie databases while running, which prevents local session extraction. Even with admin-level elevation cookie extraction runs into a dead-end due to Windows' DPAPI.
+Firefox allows concurrent read access, ensuring session extraction works seamlessly while your browser is open.
 
 ### 2. Installation & Execution
 1. Clone or download this repository to your local machine.
