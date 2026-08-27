@@ -4,7 +4,7 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { spawn } from "child_process";
+import { spawn, spawnSync } from "child_process";
 
 const app = express();
 const PORT = 3000;
@@ -292,9 +292,26 @@ app.listen(PORT, () =>
     console.log(`Server running at http://localhost:${PORT}`),
 );
 
+function commandExists(cmd) {
+  try {
+    const result = spawnSync(cmd, ["--version"], { stdio: "ignore", shell: true });
+    return result.error == null && result.status === 0;
+  } catch {
+    return false;
+  }
+}
+
 function getActivePython() {
   if (fs.existsSync(PYTHON_PATH)) {
     return PYTHON_PATH;
+  }
+  // .venv not created yet (first-run bootstrap). Windows installers put
+  // "python" on PATH; macOS/Linux typically only provide "python3".
+  if (commandExists("python")) {
+    return "python";
+  }
+  if (commandExists("python3")) {
+    return "python3";
   }
   return "python";
 }

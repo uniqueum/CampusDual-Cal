@@ -6,7 +6,6 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "sync": "cross-env PYTHONPATH=. python main.py sync-only",
     "build": "echo 'Frontend is static HTML/CSS/JS. Ready for deployment.'",
     "lint": "eslint public/*.js server.js",
     "format": "prettier --write public/* server.js"
