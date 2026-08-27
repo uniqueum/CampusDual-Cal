@@ -83,4 +83,4 @@ This file is required for the app to authenticate with your Google account and g
 
 ## Additional Information
 
-**Configuration:** Please ensure your configuration file contains your student ID, target browser session, date ranges, and Google Calendar ID.
+**Configuration:** Please ensure your configuration file contains your student ID, date ranges, and Google Calendar ID.
