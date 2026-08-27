@@ -3,6 +3,7 @@
 A local web application designed to synchronize your university schedule from the Campus Dual legacy portal to your Google Calendar or export it directly as an `.ics` calendar file.
 
 ## ⚠️ Important Note
+
 This application runs **locally** on your computer. All configuration and synchronization data are stored strictly on your local filesystem and are never transmitted to any external servers other than those required for the optional official Google Calendar API integration.
 
 ---
@@ -10,15 +11,17 @@ This application runs **locally** on your computer. All configuration and synchr
 ## Setup Instructions
 
 ### 1. Prerequisites
+
 * Node.js installed on your machine.
 * Python installed on your machine.
 * **Mozilla Firefox** (or another Gecko-based browser like LibreWolf or Floorp).
 
 > **Why Firefox?**  
-> Under Windows, Chromium-based browsers (Chrome, Edge, Opera, etc.) lock their cookie databases while running, which prevents local session extraction. Even with admin-level elevation cookie extraction runs into a dead-end due to Windows' DPAPI.
-Firefox allows concurrent read access, ensuring session extraction works seamlessly while your browser is open.
+> Chromium-based browsers (Chrome, Edge, Opera, etc.) lock their cookie databases while running, which prevents local session extraction. Even with admin-level elevation cookie extraction runs into a dead-end due to Windows' DPAPI.
+> Firefox allows concurrent read access, ensuring session extraction works seamlessly while your browser is open.
 
 ### 2. Installation & Execution
+
 1. Clone or download this repository to your local machine.
 2. Navigate to the project root directory in your terminal.
 3. Execute the setup and bootstrapper sequence:
@@ -49,7 +52,8 @@ Upon processing your schedule, the app generates two output files:
 
 If you want to use the optional **Google Calendar upload/synchronization** feature so as to have your schedule available on your handheld device, two additional configuration steps are required:
 
-### 1. Add Your Google Calendar ID  
+### 1. Add Your Google Calendar ID
+
 Enter the **Google Calendar ID** of the sub‑calendar you want the app to write to.
 *Note: It is recommended to create a separate sub-calendar for this purpose, because the uploader will **clear/reset** the calendar upon upload.*
 
@@ -69,7 +73,8 @@ Example configuration layout:
 }
 ```
 
-### 2. Provide Google OAuth Credentials  
+### 2. Provide Google OAuth Credentials
+
 Download your Google OAuth `credentials.json` from the Google Cloud Console and place it **directly in the project’s root directory** (in the same folder where `config.json` is located).
 
 This file is required for the app to authenticate with your Google account and gain permission to upload events.
@@ -77,4 +82,5 @@ This file is required for the app to authenticate with your Google account and g
 ---
 
 ## Additional Information
+
 **Configuration:** Please ensure your configuration file contains your student ID, target browser session, date ranges, and Google Calendar ID.
