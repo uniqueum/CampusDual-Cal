@@ -4,7 +4,7 @@ def get_csrf_token(session: requests.Session) -> str:
     """
     Sends a HEAD request to the SAP OData service root to fetch and return the x-csrf-token.
     """
-    url = "https://selfservice.campus-dual.de/sap/opu/odata/sap/ZCM_EM_STUDENT_TIMETABLE_SRV/"
+    url = "https://fep.campus-dual.de/sap/opu/odata/sap/ZCM_EM_STUDENT_TIMETABLE_SRV/"
     headers = {
         "x-csrf-token": "fetch",
         "Accept": "application/json"

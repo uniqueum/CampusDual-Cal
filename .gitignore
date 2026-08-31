@@ -10,9 +10,9 @@ token.json
 config.json
 
 # Local data dumps and logs
-campus_dual_dump.json
+campus_dual_dump.html
 clean_standardized_calendar.json
-campus_dual_calendar.ics
+campus_dual_schedule.ics
 pipeline_debug.log
 
 # Documentation and project-specific files to exclude
