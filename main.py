@@ -109,6 +109,9 @@ def main():
             print("Running text processor...", flush=True)
             processor.main()
             print("\n✨ Local sync & processing complete!", flush=True)
+        except token_helper.AuthRequiredError as e:
+            print(f"❌ Sync Error: {e}", flush=True)
+            print("AUTH_MISSING", flush=True)
         except Exception as e:
             print(f"❌ Sync Error: {e}", flush=True)
         return
@@ -134,6 +137,10 @@ def main():
         fetcher.fetch_campus_dual_timetable(session, csrf_token, start_dt, end_dt)
 
         print("Data fetch step reached and dumped successfully.", flush=True)
+    except token_helper.AuthRequiredError as e:
+        print(f"❌ Fetch Error: {e}", flush=True)
+        print("AUTH_MISSING", flush=True)
+        return
     except Exception as e:
         print(f"❌ Fetch Error: {e}", flush=True)
         return
